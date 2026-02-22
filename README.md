@@ -226,7 +226,7 @@ ros2 pkg list | grep rviz
 rviz2
 ```
 
-<details><summary> ⚠️만약, RViz가 없다면 클
+<details><summary> ⚠️만약, RViz가 없다면 클릭 
 </summary>
 
 <br>
