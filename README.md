@@ -23,7 +23,7 @@ Ubuntu 22.04 / ROS2 Humble***
 ```js
              ┌───────────────────────┐
              │      Gazebo World     │
-             │  (벽, 장애물, 물리엔진)│
+             │  (벽, 장애물, 물리엔진) │
              └────────────┬──────────┘
                           │
                           ▼
@@ -35,7 +35,7 @@ Ubuntu 22.04 / ROS2 Humble***
                           ▼
                      ROS2 DDS
                           │
-      ┌──────────────┬──────────────┬──────────────┐
+      ┌──────────────┬──────────────┐
       ▼              ▼              ▼
     RViz          SLAM Node        TF Tree
  (시각화)        (지도 생성)     (좌표변환)
@@ -226,7 +226,7 @@ ros2 pkg list | grep rviz
 rviz2
 ```
 
-<details><summary> ⚠️만약, RViz가 없다면
+<details><summary> ⚠️만약, RViz가 없다면 클
 </summary>
 
 <br>
@@ -237,154 +237,491 @@ sudo apt install ros-humble-rviz2
 </details>
 
 
+<br>
 
-##  🖥 3️⃣ Gazebo 설치 및 실행
-##  🖥 4️⃣ 토픽 발생 확인
-##  🖥 5️⃣ RViz 실행
-##  🖥 6️⃣ TurtleBot3 Burger 제어
-##  🖥 7️⃣ SLAM 실행 (지도 생성)
-4) “LaserScan 시각화(A)”와 “SLAM”의 차이
-✅ A: LaserScan 시각화 (간단/직관)
+##  🖥 3️⃣ Gazebo 설치 확인 및 실행
 
-필요한 것: /scan + 적절한 Fixed Frame(대개 odom 또는 base_link)
-
-RViz에서 벽이 점으로 찍히는 것을 확인
-
-✅ SLAM: 지도 생성 (한 단계 더)
-
-필요한 것: /scan + /tf(+ 종종 /odom)
-
-결과: /map 생성 → RViz에서 격자 지도가 누적됨
-
-
-
-## 🙌 안녕하세요. EASYME.md를 만든 원아입니다!
-![easyme](/assets/readme/cartoon.png)   
-
-## ❓ EASYME.md가 뭐예요?   
-- **EASYME.md**는 **<u>개발자가 README.md를 좀 더 쉽게 작성할 수 있도록</u>** 하기 위해 만들었어요.   
-- 블로그에서 글을 쓰는 것처럼 쉽게 글을 작성하고 스타일을 적용하면 오른쪽(👉)에 미리보기로 확인하실 수 있어요.   
-- 스타일을 적용하면 마크다운 문법 및 md 파일에서 인식할 수 있는 소스코드가 자동으로 적용돼요.   
-- 커서 위치, 드래그한 영역 등에 따라 스타일을 적용할 수 있으니 자유롭게 사용해보세요!
-- 복사하기를 통해 본문 내용을 복사하고 여러분의 README에 적용해보세요.   
-
-## 🙋‍♀️ 좀 더 구체적으로 가르쳐주세요!   
-1. 왼쪽 공간에서 블로그에 글을 쓰는 것처럼 README를 작성해주세요!   
-2. 👆 위에 툴바창에 보이는 다양한 스타일을 적용해보세요!   
-3. 다 작성하셨나요? 예쁘게 잘 나왔는지 오른쪽 미리보기 화면에서 확인해보세요.   
-4. 오른쪽에 작성한 글 전체를 복사하세요!   
-(저장을 원할 경우 `Ctrl + S` / `Command + S` 또는 툴바창 제일 오른쪽에 `공유하기 아이콘`을 클릭해주세요.)   
-5. 이제 여러분의 **README.md** 에 붙여넣으세요!   
-(저장 또는 공유를 할 경우 링크를 다른 사람에게 전달할 수 있어요! 😀)  
-
-## 🛠 기능 엿보기   
-
-1. [❓ EASYME.md가 뭐예요?  ](#-easymemd가-뭐예요)
-2. [🙋‍♀️ 좀 더 구체적으로 가르쳐주세요!](#-좀-더-구체적으로-가르쳐주세요)
-3. [🛠 기능 엿보기](#-기능-엿보기)
-    - [Header](#header)   
-    - [Text Style1](#text-style1)   
-    - [Text Stlye2](#text-style2)   
-    - [List](#list)      
-    - [Link](#link)   
-    - [Code Block](#code-block)   
-    - [Table](#table)   
-   
-## Header
-- # H1 Header   
-- ## H2 Header   
-- ### H3 Header   
-- #### H4 Header   
-- ##### H5 Header   
-- ###### H6 Header   
-
-<br>   
-
-## Text Style1
-- **진하게** (`Ctrl(Command) + B`)   
-- *기울이기* (`Ctrl(Command) + I`)   
-- <s>취소선</s> (`Ctrl(Command) + D`)   
-- <u>밑줄</u> (`Ctrl(Command) + U`)   
-
-<br>   
-   
-## Text Style2
-
->인용문   
-   
-<details><summary>접고 펴는 기능
-</summary>
-
-*Write here!*
-</details>
-
-- EASYME.md를 드래그하고 상단에 `Aa` 아이콘을 누르면? 👉 Easyme.md   
-- EASYME.md를 드래그하고 상단에 `A` 아이콘을 누르면? 👉 EASYME.MD   
-- EASYME.md를 드래그하고 상단에 `a` 아이콘을 누르면? 👉 easyme.md   
-   
-<br>   
-   
-## List   
-### Table of contents
-1. [title1](#write-title-here!)   
-2. [title2](#only-lowercase)   
-3. [title3](#use"-"instead-of-spacing-words)   
-4. [title4](#example)   
-    - [❓ EASYME.md가 뭐예요?](#-easymemd가-뭐예요)   
-    - [🛠 기능 엿보기](#-기능-엿보기)
-   
-### Unordered list   
-- unordered list1   
-- unordered list2   
-- unordered list3   
-- unordered list4   
-   
-### Ordered list   
-1. ordered list1   
-2. ordered list2   
-3. ordered list3   
-4. ordered list4   
-   
-<br>   
-   
-## Link   
-### General link
-- [🚗 Visit EASYME.md's Repo](https://github.com/EASYME-md/client)   
-- [🙋‍♂️ Visit ONE:A's Github](https://github.com/onealog)
-
-### Image link
-![onealog](/assets/readme/easyme.png)   
-   
-<br>   
-   
-## Code Block   
-### Code inline
-- `console.log('Hello EASYME.md!');`   
-   
-### Code block
+### 3-1. Gazebo 설치 확인
+ROS2 Desktop을 설치했다면 대부분 Gazebo가 포함되어 있습니다.
 ```js
-function makeDeveloper(name, language) {
-  if (name === 'ONE:A' && language === 'JavaScript') {
-    return 'perfect!';
-  }
-
-  return false;
-}
-
-makeDeveloper('ONE:A', 'JavaScript');
+gazebo --version
+```
+정상 예시 :
+``` js
+Gazebo multi-robot simulator, version 11.x.x
 ```
 
-<br>   
-   
-## Table   
+<br>
+
+### 3-2. Gazebo ROS 연동 패키지 확인
+```js
+ros2 pkg list | grep gazebo
+```
+최소한 다음이 보여야 정상입니다.
+- `gazebo_ros`
+- `gazebo_ros_pkgs`
 
 
-| title1 | title2 | title3 |
-| --- | --- | --- |
-| 1 | 2 | 3 |
-| 4 | 5 | 6 |
-| 7 | 8 | 9 |
+<details><summary> ⚠️ 만약 보이지 않는다면 클릭
+</summary>
+
+<br>
+
+패키지 설치하기 :
+```js
+sudo apt update
+sudo apt install -y ros-humble-gazebo-ros-pkgs
+```
+
+</details>
+
+<br>
+
+### 3-3. TurtleBot3 Gazebo 패키지 확인
+```js
+ros2 pkg list | grep turtlebot3_gazebo
+```
+정상이라면 :
+```
+turtlebot3_gazebo
+```
+없다면 설치 :
+```js
+sudo apt install ros-humble-turtlebot3-gazebo
+```
+
+<br>
+
+### 3-4. 모델 환경변수 설정
+TurtleBot3는 모델을 환경변수로 지정해야 합니다.
+```js
+echo $TURTLEBOT3_MODEL
+```
+아무 것도 나오지 않는다면 설정 필요 :
+```js
+export TURTLEBOT3_MODEL=burger
+```
+영구 설정하는 방법 :
+```js
+echo "export TURTLEBOT3_MODEL=burger" >> ~/.bashrc
+source ~/.bashrc
+```
+
+<br>
+
+### 3-5. Gazebo 실행
+<u>**‼️터미널 1에서 실행해야 합니다.**</u>  
+(Gazebo, RViz, 토픽 확인, TurtleBot3 Burger 제어가 일어나는 터미널이 개별적으로 작동하므로, 각각 다른 터미널에서 실행해야함)
+
+```js
+source /opt/ros/humble/setup.bash
+export TURTLEBOT3_MODEL=burger
+ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
+```
+
+정상적으로 실행되었다면 다음과 같은 화면을 확인할 수 있음 :
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/Gazebo.JPG?raw=true)   
+
+<br>
+
+### 3-6. 실행 후 확인해야 할 것
+
+Gazebo 창이 뜨면:  
+- TurtleBot3 Burger 로봇이 보임
+- 벽/환경이 있는 월드가 로드됨
+- LiDAR 센서가 상단에 장착된 형태
+
+<details><summary> ⚠️ 만약 보이지 않는다면 클릭
+</summary>
+
+<br>
+
+다음과 같이 Gazebo 구성 요소 중 TurtleBot3 Burger가 보이지 않는다면 :
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/Gazebo2.JPG?raw=true)   
+
+좌측 Insert 의 **TurtleBot3(Burger)** 를 Gazebo의 지도 위에 드래그 인 드롭하여 로봇을 생성해주십시오.
+ 
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/insert.JPG?raw=true)   
+
+<br>
+
+</details>
+
+<br>
+
+### 3-7. ROS2 토픽 생성 확인
+<u>**‼️터미널 2에서 실행해야 합니다.**</u>  
+Gazebo가 실행된 상태에서 새 터미널을 열고 :
+```js
+source /opt/ros/humble/setup.bash
+ros2 topic list
+```
+정상이라면 다음과 같은 토픽들이 추가로 보입니다.
+```js
+/scan
+/cmd_vel
+/odom
+/tf
+/tf_static
+/clock
+⁞
+```
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/topic2.JPG?raw=true)   
 
 
-<br>   
+<br>
+
+### 3-8. LiDAR 토픽 확인
+ros2 topic echo /clock
+```js
+ros2 topic echo /scan
+```
+출력 예:
+```js
+angle_min: -3.14
+angle_max: 3.14
+ranges: [1.23, 1.21, 1.18, ...]
+⁞
+```
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/echo_scan.JPG?raw=true)   
+
+<br>
+
+### 3-9. 시뮬레이션 시간 확인
+<u>**‼️터미널 2에서 실행해야 합니다.**</u>  
+Gazebo는 ROS2의 시뮬레이션 시간을 사용합니다.
+```js
+ros2 topic echo /clock
+```
+값이 계속 변하면 정상입니다.
+
+<br>
+
+
+##  🖥 4️⃣ RViz2 실행
+### 4-1. RViz2 설치 확인
+```js
+ros2 pkg list | grep rviz2
+```
+또는 실행 테스트 :
+```js
+rviz2
+```
+만약 `rviz2: command not found` 라면 설치 :
+```js
+sudo apt update
+sudo apt install -y ros-humble-rviz2
+```
+
+<br>
+
+### 4-2. RViz2 실행 (권장 : TurtleBot3 기본 설정 사용)
+<u>**‼️터미널 2에서 실행해야 합니다.**</u>  
+```js
+source /opt/ros/humble/setup.bash
+export TURTLEBOT3_MODEL=burger
+ros2 launch turtlebot3_bringup rviz2.launch.py
+```
+이 런치는 TurtleBot3에 맞춘 RViz 기본 설정을 같이 불러오기 위한 것 입니다.
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/rviz1.JPG?raw=true)   
+
+
+<br>
+
+### 4-3. RViz 기본 설정
+RViz에서 좌측 상단 **Global Option** 의 **Fixed Frame** 을 설정합니다.
+
+✅ **Fixed Frame 설정**
+- `odom`으로 설정
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/fixedframe.JPG?raw=true)   
+
+❗ Fixed Frame이 잘못되면 화면이 비거나 “No transform” 오류가 뜹니다.
+
+<br>
+
+### 4-4. RViz에 디스플레이 추가하기
+
+좌측 **Display 패널**에서 **Add 버튼** 클릭하여 아래 항목들을 추가합니다.
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/add1.JPG?raw=true)   
+
+#### (1) RobotModel (로봇 외형)
+- Add → RobotModel
+- 로봇 URDF를 기반으로 모델이 보입니다.  
+
+✅ 정상 확인 : 로봇 형태가 3D로 보임
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/robotmodel.JPG?raw=true)   
+
+
+
+#### (2) TF (좌표계)
+- Add  → TF  
+
+✅ 정상 확인 : 좌표축들이 로봇 주변에 표시됨  
+✅ 정상 확인 : 로봇이 움직이면 좌표축도 이동/회전
+
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/TF.JPG?raw=true)   
+
+
+#### (3) LaserScan (LiDAR 시각화)
+- Add   → LaserScan
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/laserscan.JPG?raw=true)   
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/laserscan2.JPG?raw=true)
+
+- Topic → `/scan` 선택  
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/lasertopic1.JPG?raw=true)   
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/lasertopic2.JPG?raw=true)   
+
+
+✅ 정상 확인 : 벽/장애물이 점 또는 선 형태로 보임  
+✅ 정상 확인 : 로봇을 움직이면 점들이 상대적으로 변화  
+✅ 정상 확인 : 로봇이 움직이면 좌표축도 이동/회전  
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/laser.JPG?raw=true)   
+
+
+
+#### (4) Odometry (이동 궤적 확인)
+- Add → Odometry
+- Topic → `/odom`  
+
+✅ 정상 확인 : 로봇이 이동하면 궤적(화살표/선)이 나타남
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/odometry.JPG?raw=true)   
+
+<br>
+
+### 4-5. RViz 설정 저장하기
+RViz 상단 메뉴 :
+- File → Save Config As…
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/saverviz.jpg?raw=true)   
+
+- 예 : `rviz_config/tb3_slam.rviz`  
+
+다음부터는 이렇게 실행 가능 :
+```js
+rviz2 -d rviz_config/tb3_slam.rviz
+```
+
+<br>
+
+##  🖥 5️⃣ TurtleBot3 Burger 제어
+
+### 5-1. ` /cmd_vel` 토픽 이해
+TurtleBot3는 `/cmd_vel` 토픽을 구독하여 이동합니다.  
+메시지 타입 :
+```js
+geometry_msgs/Twist
+```
+주요 필드 :
+```js
+linear.x → 전진/후진 속도 (m/s)
+angular.z → 회전 속도 (rad/s)
+```
+예시 :
+```
+linear.x = 0.2
+angular.z = 0.0
+→ 직진
+
+linear.x = 0.0
+angular.z = 0.5
+→ 제자리 회전
+```
+
+<br>
+
+### 5-2. 키보드 제어 실행 (Teleop)
+<u>**‼️터미널 3에서 실행해야 합니다.**</u>
+```js
+source /opt/ros/humble/setup.bash
+export TURTLEBOT3_MODEL=burger
+ros2 run turtlebot3_teleop teleop_keyboard
+```
+기본 키 설명
+```js
+w : 전진
+x : 후진
+a : 좌회전
+d : 우회전
+s : 정지
+```
+
+<br>
+
+### 5-3. `/cmd_vel` 토픽 실시간 확인
+<u>**‼️터미널 4에서 실행해야 합니다.**</u>  
+새 터미널을 열고 :
+```js
+ros2 topic echo /cmd_vel
+```
+키를 누르면 다음과 같은 메세지가 출력됩니다.
+```
+linear:
+  x: 0.2
+angular:
+  z: 0.0
+```
+👉 키보드 입력이 ROS2 토픽으로 publish되는 것을 확인하세요.
+
+<br>
+
+### 5-4. RViz에서 수집 데이터 관찰
+#### 1. Gazebo에서 TurtleBot3 이동 확인
+#### 2. RViz에서 LaserScan 변화 관찰
+#### 3. Odometry 확인
+#### 4. TF 변화 확인 
+
+<br>
+
+##  🖥 6️⃣ SLAM 실행 (지도 생성)  
+**LaserScan 시각화(A)** 와 **SLAM** 의 차이  
+
+✅ LaserScan 시각화 (간단/직관)  
+- 필요한 것: /scan + 적절한 Fixed Frame
+- RViz에서 벽이 점으로 찍히는 것을 확인
+
+✅ SLAM: 지도 생성 (한 단계 더)  
+- 필요한 것: /scan + /tf(+ 종종 /odom)
+- 결과: /map 생성 → RViz에서 격자 지도가 누적됨
+
+<br>
+
+### 6-1. SLAM이 동장하는 조건
+SLAM은 `/scan`만으로는 동작하지 않습니다.  
+최소 아래 3가지가 준비되어야 합니다.  
+- `/scan` : LiDAR 거리 데이터
+- `/tf` (및 `/tf_static`) : 좌표계 변환
+- `/odom` : 로봇 이동 정보
+
+✅ 준비 상태 확인 :
+```js
+source /opt/ros/humble/setup.bash
+ros2 topic list | grep -E "scan|tf|odom|clock"
+```
+정상이라면 최소 아래가 보여야 합니다 :
+- `/scan`
+- `/tf`
+- `/tf_static`
+- `/odom`
+- `/clock` (Gazebo 시뮬레이션 시간)
+
+‼️ /clock이 존재하면, SLAM 실행 시 use_sim_time:=True 설정이 필수입니다  
+
+<br>
+
+### 6-2. SLAM 방식 선택
+TurtleBot3 + ROS2 Humble 환경에서 SLAM은 보통 다음 중 하나를 사용합니다.  
+
+✅ A) Cartographer
+- Robotis(TurtleBot3) 제공 런치와 호환이 좋음
+  
+✅ B) slam_toolbox (Nav2 확장에 유리)
+- 추후 Navigation2까지 확장할 계획이면 유리합니다.
+
+<br>
+
+### 6-3. Cartographer SLAM 설치 확인
+Cartographer SLAM 설치 방법 :
+```js
+sudo apt update
+sudo apt install -y ros-humble-turtlebot3-cartographer
+```
+설치 확인 :
+```js
+ros2 pkg list | grep cartographer
+```
+
+<br>
+
+### 6-4. Cartographer SLAM 실행  
+⚠️ 전제: Gazebo가 이미 실행 중이어야 합니다.  
+(Gazebo 실행은 터미널 1에서 계속 켜 둔 상태)
+
+<u>**‼️터미널 5에서 실행해야 합니다.**</u>
+
+```js
+source /opt/ros/humble/setup.bash
+export TURTLEBOT3_MODEL=burger
+ros2 launch turtlebot3_cartographer cartographer.launch.py use_sim_time:=True
+```
+성공하면 SLAM 노드가 `/map`을 publish하기 시작합니다.
+
+RViz가 실행되며 다음과 같은 화면을 확인할 수 있습니다.
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/slam1.jpg?raw=true)   
+
+<br>
+
+### 6-5.  RViz에서 지도 `/map` 표시
+RViz에서 아래 설정을 합니다.  
+1. Fixed Frame 변경
+    - SLAM 전 : `odom`
+     - SLAM 후 지도 기준으로 보기 위해 `map`으로 변경  
+
+📌 RViz 좌측 상단 : Global Options → Fixed Frame → map
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/slam2.JPG?raw=true)   
+
+
+
+2. Map 디스플레이 추가
+- Add → Map
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/slam3.JPG?raw=true)   
+
+- Topic → `/map`  
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/slam4.JPG?raw=true)   
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/slam5.JPG?raw=true)   
+
+
+<br>
+
+## 6-6. 로봇을 움직여서 지도 채우기
+<u>**‼️터미널 4에서 실행해야 합니다.**</u>  
+
+Telecop을 활용해 Gazebo의 TurtleBot3를 움직였던 터미널에서 키보드 값을 입력하여 로봇을 천천히 이동시키며 지도를 생성합니다.
+
+📌 잘 작동한다면 로봇이 이동할수록 지도(격자)가 점점 채워집니다.
+
+
+<details><summary> ⚠️ 키보드 입력하는 터미널을 종료했을 경우 클릭
+</summary>
+
+<br>
+
+만약, 기존 Telecop이 활성화되었던 터미널을 종료시켰다면, 아래 명령어를 입력하여 새로 활성화하십시오.
+```js
+source /opt/ros/humble/setup.bash
+ros2 run turtlebot3_teleop teleop_keyboard
+```
+
+<br>
+
+
+</details>
+
+
+<br>
+
+**주행 팁(지도 품질 개선)**
+- 갑자기 빠르게 회전하지 말기  
+- 벽을 따라 천천히 이동하기  
+- 한 구역을 원형으로 크게 돌아보며 닫힌 루프 만들기  
+
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/slam6.JPG?raw=true)   
 
