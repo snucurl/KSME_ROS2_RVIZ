@@ -2,7 +2,7 @@
   
 
 **[Environment]**  
-***TurtleBot3 Burger + Gazebo + RViz  
+***TurtleBot3 Burger + Gazebo + RViz  + Navigation  
 Ubuntu 22.04 / ROS2 Humble***
 
 📌 **강의 목표**  
@@ -13,58 +13,83 @@ Ubuntu 22.04 / ROS2 Humble***
 - LiDAR 데이터 /scan 시각화
 - Differential Drive 제어 (/cmd_vel)
 - SLAM을 통한 지도 생성 (/map)
+- Navigation을 통한 자율 주행
 
 <br>
 
 ##  🖥 1️⃣ 전체 구조 이해
 **Gazebo**에서 **TurtleBot3**을 움직이고,  
 그 과정에서 생성되는 **센서/좌표/지도 데이터**를 ROS2 토픽으로 주고받아,  
-**RViz에서 시각화**하고, **SLAM**으로 `/map`을 만들 수 있습니다.
+**RViz에서 시각화**하고, **SLAM**으로 `/map`을 만들 수 있으며,    
+**Navigation2**를 통해 목표 지점까지 자율주행할 수 있습니다.
 ```js
              ┌───────────────────────┐
-             │      Gazebo World     │
-             │  (벽, 장애물, 물리엔진) │
+             │      Gazebo World      │
+             │ (벽, 장애물, 물리엔진)  │
              └────────────┬──────────┘
                           │
-                          ▼
-               Gazebo LiDAR Plugin
-                          │
-                          ▼
-                 /scan  (LaserScan)
-                          │
-                          ▼
-                     ROS2 DDS
-                          │
-      ┌──────────────┬──────────────┐
-      ▼              ▼              ▼
-    RViz          SLAM Node        TF Tree
- (시각화)        (지도 생성)     (좌표변환)
-                      │
-                      ▼
-                   /map
+        ┌─────────────────┼─────────────────┐
+        ▼                 ▼                 ▼
+ Gazebo LiDAR Plugin   Gazebo Base/Odom   Gazebo TF publish
+        │                 │                 │
+        ▼                 ▼                 ▼
+     /scan              /odom           /tf, /tf_static
+        │                 │                 │
+        └──────────────┬──┴──────────────┬──┘
+                       ▼                 ▼
+                    (ROS2 DDS / Topics & TF)
+                       │
+     ┌─────────────────┼─────────────────────────────────────────┐
+     ▼                 ▼                                         ▼
+    RViz            SLAM Node                                  Nav2
+(시각화/Goal)     (지도 생성)                         (Localization + Planning + Control)
+     │                 │                                         │
+     │                 ▼                                         │
+     │              /map  (OccupancyGrid)                         │
+     │                 │                                         │
+     │                 ├──────────────┐                          │
+     │                 ▼              ▼                          │
+     │            Map Server       (옵션) Save Map               │
+     │                 │                                         │
+     │                 ▼                                         ▼
+     │          Localization (AMCL)  ───── publish ─────▶  map→odom TF
+     │                                                         │
+     │   (Goal: /goal_pose or action)                           │
+     └─────────────────────────────────────────────────────────▶│
+                                                               ▼
+                                                           /cmd_vel
+                                                               ▼
+                                                     TurtleBot3 Base Controller
 ```
 
 <br>  
 
 ### 1-1. 전체 데이터 흐름
 ```js
-[Keyboard] 
+[Keyboard]
    ↓ (teleop node)
- /cmd_vel  (geometry_msgs/Twist)
-   ↓
-[TurtleBot3 base controller in simulation]
-   ↓
-/odom  +  /tf   (로봇이 얼마나 움직였는지, 좌표계가 어떻게 연결되는지)
-   ↓
-[Virtual LiDAR in Gazebo]
-   ↓
-/scan  (sensor_msgs/LaserScan)
-   ↓
-[SLAM node]
-   ↓
-/map (nav_msgs/OccupancyGrid)
-   ↓
-[RViz]  ←  /scan, /tf, /odom, /map 등을 “보여줌”
+ /cmd_vel (geometry_msgs/Twist)          ┌───────────────────────────────────────┐
+   ↓                                     │               Nav2 (Navigation2)      │
+[TurtleBot3 base controller in simulation]│  (Localization + Planning + Control) │
+   ↓                                     └───────────────┬───────────────────────┘
+/odom + /tf (odom→base_link 등)                           │
+   ↓                                                       │   (RViz Goal / Nav2 BT)
+[Virtual LiDAR in Gazebo]                                  │   /goal_pose or action
+   ↓                                                       │
+/scan (sensor_msgs/LaserScan)                              │
+   ↓                                                       │
+[SLAM node] ───────────────► /map (nav_msgs/OccupancyGrid) │
+   │                                                       │
+   │ (map→odom TF 제공: SLAM 또는 AMCL)                     │
+   ▼                                                       ▼
+(map 프레임 생성/갱신)                               /cmd_vel (자율주행 속도 명령)
+                                                       │
+                                                       ▼
+                                        [TurtleBot3 base controller in simulation]
+
+[RViz]
+  ├─ 시각화: /scan, /tf, /odom, /map, costmaps, planned path…
+  └─ 입력: 2D Pose Estimate(초기위치), Nav2 Goal(목표점)
 ```
 
 <br>
@@ -99,6 +124,12 @@ Ubuntu 22.04 / ROS2 Humble***
       - 메시지 타입 : `nav_msgs/OccupancyGrid`
       - RViz에서 Map 디스플레이로 확인
       - `/scan` + TF(로봇 자세/이동) 정보가 합쳐져서 만들어짐
+
+5. `/goal_pose` 또는 Nav2 Action
+     - RViz에서 Nav2 Goal 클릭 시 목표 위치가 전달됨
+     - Nav2는 이를 받아 경로를 계획하고 `/cmd_vel`을 publish  
+
+<br>
 
 ##  🖥 2️⃣ ROS2 설치 확인
 
@@ -238,6 +269,73 @@ sudo apt install ros-humble-rviz2
 
 
 <br>
+
+### 2-7.Navigation 설치 확인
+
+Navigation2를 사용하려면 최소 아래 패키지가 필요합니다.
+- `ros-humble-navigation2`
+- `ros-humble-nav2-bringup`
+
+패키지 존재 확인 :
+```js
+ros2 pkg list | grep nav2
+```
+정상이라면 다음과 유사한 목록이 보입니다 :
+```js
+nav2_amcl
+nav2_bt_navigator
+nav2_controller
+nav2_costmap_2d
+nav2_map_server
+nav2_planner
+nav2_recoveries
+nav2_waypoint_follower
+nav2_bringup
+```
+
+bringup 패키지 확인 :
+```js
+ros2 pkg list | grep nav2_bringup
+```
+정상 출력 예 :
+```js
+nav2_bringup
+```
+
+
+<details><summary> ⚠️Navigation 설치가 안 되어 있을 경우 클릭  
+</summary>
+
+
+<br>
+
+
+```js
+sudo apt update
+sudo apt install -y ros-humble-navigation2 ros-humble-nav2-bringup
+```
+설치 후 다시 확인 :
+```js
+ros2 pkg list | grep nav2
+```
+<br>
+
+</details>
+
+
+map_server 존재 확인 (지도 로딩용)  :  
+Navigation에서 지도 파일을 불러올 때 사용됩니다.
+```js
+ros2 pkg list | grep map_server
+```
+또는 실행 파일 확인 :
+```js
+ros2 run nav2_map_server map_saver_cli --help
+```
+도움말이 출력되면 정상입니다.
+
+<br>
+
 
 ##  🖥 3️⃣ Gazebo 설치 확인 및 실행
 
@@ -724,4 +822,140 @@ ros2 run turtlebot3_teleop teleop_keyboard
 
 
 ![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/slam6.JPG?raw=true)   
+
+
+##  🖥 7️⃣ Navigation으로 자율주행
+
+### 7-1. Navigation이 동작하는 조건
+Navigation(자율주행)은 크게 두 단계 중 하나로 진행됩니다.
+- ✅ (A)  Localization 기반 Navigation  
+    이미 만든 지도 `map.yaml`을 불러오고, AMCL로 로봇 위치추정 → Nav2로 경로계획/주행
+
+- (B) SLAM과 Navigation 동시 실행  
+    실시간으로 지도 만들면서 목표점 이동
+
+<br>
+
+### 7-2. Nav2 설치 확인하기
+```js
+ros2 pkg list | grep nav2
+```
+정상적으로 설치되어 있다면 :
+```js
+turtlebot3_navigation2
+```
+
+<details><summary> ⚠️ Navigation2가 설치되어 있지 않다면 클릭
+</summary>
+
+<br>
+
+```js
+sudo apt update
+sudo apt install -y ros-humble-turtlebot3-navigation2
+```
+설치 확인하기 :
+```js
+ros2 pkg list | grep turtlebot3_navigation2
+```
+설치가 완료되었다면 :
+```
+turtlebot3_navigation2
+```
+
+<br>
+</details>
+
+
+Navigation2 기본 패키지도 설치 확인하기
+```js
+sudo apt install -y ros-humble-navigation2 ros-humble-nav2-bringup
+```
+확인 :
+```js
+ros2 pkg list | grep nav2
+```
+
+<br>
+
+### 7-3. SLAM으로 맵 저장하기
+<u>**‼️터미널 6에서 실행해야 합니다.**</u>  
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/fslam1.JPG?raw=true) 
+
+SLAM 단계에서 지도를 어느 정도 만든 다음, 아래 명령어로 저장합니다.
+
+```js
+ros2 run nav2_map_server map_saver_cli -f ~/tb3_map
+```
+저장 결과 :
+- `~/tb3_map.yaml`
+- `~/tb3_map.pgm`
+
+<br>
+
+### 7-4. Gazebo 실행
+<u>**‼️열려있는 Gazebo, RViz, Teleop 터미널을 전부 종료해줍니다.**</u>  
+<u>**‼️새로운 터미널에서 Gazebo를 실행해줍니다. (터미널1)**</u>  
+
+```js
+source /opt/ros/humble/setup.bash
+export TURTLEBOT3_MODEL=burger
+ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
+```
+
+<br>
+
+### 7-5. Navigation2 실행
+<u>**‼️새로운 터미널에서 Navigation2를 실행해줍니다. (터미널2)**</u>  
+Robotis는 TurtleBot3에서 Nav2 런치를 `turtlebot3_navigation2 navigation2.launch.py`로 안내하고, `map:=...`로 지도 파일을 넘깁니.
+```js
+source /opt/ros/humble/setup.bash
+export TURTLEBOT3_MODEL=burger
+ros2 launch turtlebot3_navigation2 navigation2.launch.py map:=$HOME/tb3_map.yaml use_sim_time:=True
+```
+‼️지도 파일의 저장 경로가 다를 수 있습니다. `map:=...` 에 입력되는 지도 파일의 저장 경로를 확인해야합니다.  
+‼️`use_sim_time:=True` : Gazebo의 /clock(시뮬레이션 시간)을 사용
+
+<br>
+
+### 7-6. RViz에서 "초기 위치 추정"
+처음 시작 화면 :
+
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/fslam2.JPG?raw=true)   
+
+
+
+
+Nav2는 시작할 때 로봇이 지도에서 어디있는지 설정해줘야합니다.
+1. RViz 상단 툴바 → “2D Pose Estimate” 클릭
+![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/fslam3.JPG?raw=true)   
+
+2. 지도 위에서 로봇 위치로 클릭 + 방향 드래그
+
+- 대략 맞췄을 때의 모습 :
+
+  ![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/fslam4.JPG?raw=true)   
+
+- 비교적 정확히 맞췄을 때의 모습 :
+  ![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/fslam5.JPG?raw=true)   
+
+3. 로봇이 지도에 '정렬'되는지 확인  
+‼️이 단계가 안 되면 Goal을 줘도 로봇이 엉뚱하게 움직이거나 실패할 수 있습니다.
+
+### 7-7. RViz에서 "목표점 보내기"
+1. RViz 상단 툴바 → “Nav2 Goal” 클릭
+  ![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/fslam6.JPG?raw=true)   
+
+2. 지도 위 목표 위치 클릭 + 방향 드래그
+  ![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/fslam7.jpg?raw=true)   
+
+3. 로봇이 경로를 계획하고 이동하는지 확인
+  ![title](https://github.com/snucurl/KSME_ROS2_RVIZ/blob/main/readme/fslam8.JPG?raw=true)   
+
+
+
+
+
+
 
